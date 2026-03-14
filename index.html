@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Iron Grid Calculator</title>
+
+<link rel="manifest" href="manifest.json">
+
+<style>
+
+body{
+font-family:Arial;
+background:#f3f3f3;
+text-align:center;
+padding:30px;
+}
+
+.card{
+background:white;
+padding:25px;
+max-width:700px;
+margin:auto;
+border-radius:10px;
+box-shadow:0 0 10px rgba(0,0,0,0.15);
+}
+
+input{
+padding:8px;
+margin:6px;
+width:130px;
+}
+
+button{
+padding:10px 20px;
+cursor:pointer;
+}
+
+canvas{
+margin-top:20px;
+border:1px solid #ccc;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<h2>Iron Grid Calculator</h2>
+
+<div>
+Grid Width (ft)<br>
+<input type="number" id="width">
+</div>
+
+<div>
+Grid Height (ft)<br>
+<input type="number" id="height">
+</div>
+
+<div>
+Internal Grid Width (ft)<br>
+<input type="number" id="cellW">
+</div>
+
+<div>
+Internal Grid Height (ft)<br>
+<input type="number" id="cellH">
+</div>
+
+<br>
+<button onclick="calculate()">Calculate</button>
+
+<h3 id="result"></h3>
+
+<canvas id="canvas" width="520" height="350"></canvas>
+
+</div>
+
+<script>
+
+function calculate(){
+
+let W=parseFloat(width.value);
+let H=parseFloat(height.value);
+let gw=parseFloat(cellW.value);
+let gh=parseFloat(cellH.value);
+
+let verticalBars=Math.floor(W/gw)+1;
+let horizontalBars=Math.floor(H/gh)+1;
+
+let verticalIron=verticalBars*H;
+let horizontalIron=horizontalBars*W;
+
+let total=verticalIron+horizontalIron;
+
+result.innerHTML=
+"Vertical Bars: "+verticalBars+"<br>"+
+"Horizontal Bars: "+horizontalBars+"<br>"+
+"Total Iron Required: "+total.toFixed(2)+" ft";
+
+drawGrid(W,H,gw,gh);
+
+}
+
+function drawGrid(W,H,gw,gh){
+
+let canvas=document.getElementById("canvas");
+let ctx=canvas.getContext("2d");
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+let scale=Math.min(canvas.width/W,canvas.height/H);
+
+let w=W*scale;
+let h=H*scale;
+
+let startX=(canvas.width-w)/2;
+let startY=(canvas.height-h)/2;
+
+ctx.strokeRect(startX,startY,w,h);
+
+for(let x=gw;x<W;x+=gw){
+
+let pos=startX+x*scale;
+
+ctx.beginPath();
+ctx.moveTo(pos,startY);
+ctx.lineTo(pos,startY+h);
+ctx.stroke();
+
+}
+
+for(let y=gh;y<H;y+=gh){
+
+let pos=startY+y*scale;
+
+ctx.beginPath();
+ctx.moveTo(startX,pos);
+ctx.lineTo(startX+w,pos);
+ctx.stroke();
+
+}
+
+}
+
+/* SERVICE WORKER */
+
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("service-worker.js");
+}
+
+</script>
+
+</body>
+</html>
